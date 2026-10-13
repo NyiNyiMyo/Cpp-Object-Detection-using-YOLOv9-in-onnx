@@ -61,15 +61,15 @@ int main() {
         // -------------------
         // Settings (change as needed)
         // -------------------
-        const std::wstring model_path = L"v9-s_mit.onnx"; // <- set your model path
-        const std::string images_dir = "animals-tests";    // <- set your images folder
+        const std::wstring model_path = L"v9-s_mit.onnx";
+        const std::string images_dir = "animals-tests";
         const int input_w = 640;    
         const int input_h = 480;    
         const float conf_thresh = 0.25f;
         const float iou_thresh = 0.4f;
         const int max_images = 8;
 
-        // COCO classes (same as you had)
+        // COCO classes
         std::vector<std::string> classes = {
             "person","bicycle","car","motorbike","aeroplane","bus","train","truck",
             "boat","traffic light","fire hydrant","stop sign","parking meter","bench","bird","cat",
@@ -89,7 +89,6 @@ int main() {
         Ort::Env env(ORT_LOGGING_LEVEL_WARNING, "YOLOv9");
         Ort::SessionOptions session_options;
         session_options.SetIntraOpNumThreads(1);
-        // you can append CUDA EP here if desired similar to your C# (requires linking/compilation flags)
         Ort::Session session(env, model_path.c_str(), session_options);
         Ort::AllocatorWithDefaultOptions allocator;
 
@@ -122,11 +121,11 @@ int main() {
             int orig_w = img_bgr.cols;
             int orig_h = img_bgr.rows;
 
-            // convert BGR -> RGB (as in your C#)
+            // convert BGR -> RGB 
             cv::Mat img;
             cv::cvtColor(img_bgr, img, cv::COLOR_BGR2RGB);
 
-            // Resize to input size (note: this stretches; same as your C# Resize)
+            // Resize to input size 
             cv::Mat resized;
             cv::resize(img, resized, cv::Size(input_w, input_h));
             resized.convertTo(resized, CV_32F, 1.0f / 255.0f);
@@ -134,7 +133,7 @@ int main() {
             // HWC -> CHW float vector
             std::vector<float> input_tensor_values(1 * 3 * input_h * input_w);
             size_t idx = 0;
-            // order: channel major (c, y, x) matching your C# loop
+            // order: channel major (c, y, x) 
             for (int c = 0; c < 3; ++c) {
                 for (int y = 0; y < input_h; ++y) {
                     for (int x = 0; x < input_w; ++x) {
